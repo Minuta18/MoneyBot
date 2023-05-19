@@ -7,7 +7,7 @@ class User(Base):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True, index=True)
-    hashed_password = Column(String)
+    hashed_password = Column(String(255))
     coins = Column(Integer)
     is_banned = Column(Boolean)
 
@@ -16,6 +16,6 @@ class Transaction(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     sum = Column(Integer)
-    sender_id = Column(Integer, ForeignKey('User.id'))
-    receiver_id = Column(Integer, ForeignKey('User.id'))
+    sender_id = Column(Integer, ForeignKey('users.id'))
+    receiver_id = Column(Integer, ForeignKey('users.id'))
 

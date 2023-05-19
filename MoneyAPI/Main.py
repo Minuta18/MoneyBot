@@ -1,28 +1,22 @@
+import uvicorn
 from fastapi import FastAPI
-from MoneyAPI.database import Crud
+from database import Crud
+from users import usr_router
 
 app = FastAPI()
+app.include_router(usr_router)
 
-@app.route('/user/{user_id}')
-def get_user(user_id: int):
-    return Crud.get_user(user_id)
+@app.get('/')
+async def root():
+    return {'test': True}
 
-@app.route('/user/create')
-def create_user():
+@app.get('/transaction/')
+async def make_transaction():
     ...
 
-@app.route('/user/delete/{user_id}')
-def delete_user(user_id: int):
+@app.get('/transaction/{transaction_id}')
+async def get_transaction(transaction_id: int):
     ...
 
-@app.route('/user/edit/{user_id}')
-def edit_user(user_id: int):
-    ...
-
-@app.route('/transaction/')
-def make_transaction():
-    ...
-
-@app.route('/transaction/{transaction_id}')
-def get_transaction(transaction_id: int):
-    ...
+if __name__ == '__main__':
+    uvicorn.run('Main:app', host='127.0.0.1', port=8000, reload=True)

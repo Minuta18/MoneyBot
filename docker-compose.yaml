@@ -1,0 +1,19 @@
+version: "3.8"
+
+services:
+  database:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_DATABASE: "main"
+      MYSQL_ROOT_PASSWORD: "test"
+      MYSQL_USER: "api"
+      MYSQL_PASSWORD: "test"
+      MYSQL_TCP_PORT: 17001
+    ports:
+      - "17001:17001"
+    volumes:
+      - database:/var/lib/mysql
+
+volumes:
+  database:
