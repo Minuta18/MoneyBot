@@ -1,7 +1,7 @@
 import uvicorn
 from fastapi import FastAPI
-from database import Crud
-from users import usr_router
+from Database import Crud
+from Users import usr_router
 
 app = FastAPI()
 app.include_router(usr_router)

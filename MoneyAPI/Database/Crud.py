@@ -2,7 +2,7 @@ from . import Base
 from . import Models
 from sqlalchemy.orm import Session
 
-def get_user(user_id: int, db: Session):
+def get_user(db: Session, user_id: int):
     return db.query(Models.User).filter(Models.User.id == user_id).first()
 
 def get_user_by_email(db: Session, email: str):
@@ -11,16 +11,34 @@ def get_user_by_email(db: Session, email: str):
 def get_users(db: Session, skip: int = 0, limit: int = 100):
     return db.query(Models.User).offset(skip).limit(limit).all()
 
-def create_user(db: Session, password: str):
+def create_user(db: Session, password: str, coins: int = 200):
     new_user = Models.User(
-        password=password,
-        coins=2000,
+        hashed_password=password,
+        coins=coins,
         is_banned=False,
     )
     db.add(new_user)
     db.commit()
     db.refresh(new_user)
     return new_user
+
+def delete_user(db: Session, id: int):
+    user = db.query(Models.User).filter(Models.User.id == id).first()
+    if user != None:
+        db.delete(user)
+        db.commit()
+    else:
+        raise ValueError(f'No user with id {id}')
+    return user
+
+def edit_user(db: Session, id: int, new_password: str):
+    user = db.query(Models.User).filter(Models.User.id == id).first()
+    if user != None:
+        user.hashed_password = new_password
+        db.commit()
+    else:
+        raise ValueError(f'No user with id {id}')
+    return user
 
 def get_transaction(db: Session, id: int):
     return db.query(Models.Transaction).filter(Models.Transaction.id == id).first()
