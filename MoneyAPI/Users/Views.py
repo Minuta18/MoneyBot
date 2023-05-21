@@ -10,11 +10,27 @@ usr_router = APIRouter(
     tags=['users',],
 )
 
+@usr_router.get('/', tags=['users', ])
+async def get_users(page: int = 1, page_size: int = 20, db: Session = Depends(get_db)):
+    usrs = Crud.get_users(db, page_size * (page - 1), page_size)
+    result = {'users': []}
+    for usr in usrs:
+        result['users'].append({
+            'id': usr.id,
+            'coins_count': usr.coins,
+            'is_banned': usr.is_banned,
+        })
+    return result
+
 @usr_router.get('/{user_id}', tags=['users', ])
 async def get_user(user_id: int, db: Session = Depends(get_db)):
-    usr =  Crud.get_user(db, user_id)
-
-    return usr if usr != None else {}
+    usr = Crud.get_user(db, user_id)
+    if usr != None:
+        return {
+            'id': usr.id,
+            'coins_count': usr.coins,
+            'is_banned': usr.is_banned,
+        }
 
 @usr_router.post('/create', tags=['users', ])
 async def create_user(user: UserShema, db: Session = Depends(get_db)):

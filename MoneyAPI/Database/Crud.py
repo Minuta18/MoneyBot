@@ -43,9 +43,9 @@ def edit_user(db: Session, id: int, new_password: str):
 def get_transaction(db: Session, id: int):
     return db.query(Models.Transaction).filter(Models.Transaction.id == id).first()
 
-def create_transaction(db: Session, sum: int, sender_id: int, receiver_id: int):
+def create_transaction(db: Session, amount: int, sender_id: int, receiver_id: int):
     new_transaction = Models.Transaction(
-        sum=sum,
+        amount=amount,
         sender_id=sender_id,
         receiver_id=receiver_id,
     )

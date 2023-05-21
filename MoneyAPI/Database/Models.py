@@ -15,7 +15,7 @@ class Transaction(Base):
     __tablename__ = 'transactions'
 
     id = Column(Integer, primary_key=True, index=True)
-    sum = Column(Integer)
+    amount = Column(Integer)
     sender_id = Column(Integer, ForeignKey('users.id'))
     receiver_id = Column(Integer, ForeignKey('users.id'))
 
