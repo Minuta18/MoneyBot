@@ -8,9 +8,8 @@ app = FastAPI()
 app.include_router(usr_router)
 app.include_router(trans_router)
 
-@app.get('/')
-async def root():
-    return {'test': True}
+HOST = '127.0.0.1'
+PORT = 8000
 
 if __name__ == '__main__':
-    uvicorn.run('Main:app', host='127.0.0.1', port=8000, reload=True)
+    uvicorn.run('Main:app', host=HOST, port=PORT, reload=True)

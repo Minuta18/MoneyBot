@@ -11,6 +11,7 @@ trans_router = APIRouter(
 
 @trans_router.post('/make/')
 async def make_transaction(transaction: TransactionShema, db: Session = Depends(get_db)):
+    '''Creates transactions. Need password'''
     sender = Crud.get_user(db, transaction.sender_id)
     if sender == None:
         raise HTTPException(
@@ -50,7 +51,11 @@ async def make_transaction(transaction: TransactionShema, db: Session = Depends(
 
 @trans_router.get('/{transaction_id}')
 async def get_transaction(transaction_id: int, db: Session = Depends(get_db)):
+    '''Gets a transaction by id'''
     transaction = Crud.get_transaction(db, transaction_id)
     if transaction == None:
-        return {}
+        raise HTTPException(
+            detail=f'No transaction with id {transaction_id}',
+            status_code=404,
+        )
     return transaction
