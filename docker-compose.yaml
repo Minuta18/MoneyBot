@@ -5,6 +5,7 @@ services:
     image: mysql:8.0
     restart: always
     environment:
+      DB_HOST: .
       MYSQL_DATABASE: "main"
       MYSQL_ROOT_PASSWORD: "test"
       MYSQL_USER: "api"
@@ -13,7 +14,25 @@ services:
     ports:
       - "17001:17001"
     volumes:
-      - database:/var/lib/mysql
+      - ./MySQLData:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:17001"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+  api:
+    restart: on-failure
+    build:
+      dockerfile: ./MoneyAPI/Dockerfile
+    volumes:
+      - type: bind
+        source: ./MoneyAPI
+        target: /app
+    ports:
+      - 17002:17002
+    depends_on:
+      database:
+        condition: service_healthy
 
-volumes:
-  database:
+networks:
+  main:

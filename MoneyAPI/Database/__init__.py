@@ -2,8 +2,15 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-engine = create_engine('mysql+pymysql://api:test@127.0.0.1:17001/main')
+DB_USER = 'api'
+DB_PASSWORD = 'test'
+DB_HOST = 'database'
+DATABASE = 'main'
+DB_PORT = 17001
 
+connect_uri = f'mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DATABASE}'
+
+engine = create_engine(connect_uri)
 Base = declarative_base()
 
 from . import Models
