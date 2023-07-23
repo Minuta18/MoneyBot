@@ -10,29 +10,26 @@ services:
       MYSQL_ROOT_PASSWORD: "test"
       MYSQL_USER: "api"
       MYSQL_PASSWORD: "test"
-      MYSQL_TCP_PORT: 17001
+      MYSQL_TCP_PORT: 17011
     ports:
-      - "17001:17001"
+      - "17011:17011"
     volumes:
-      - ./MySQLData:/var/lib/mysql
+      - ./mySQLData:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:17001"]
+      test: ["CMD", "curl", "-f", "http://localhost:17011"]
       interval: 10s
       timeout: 10s
       retries: 10
-  api:
+  users-api:
+    build: ./users/Dockerfile
     restart: on-failure
-    build:
-      dockerfile: ./MoneyAPI/Dockerfile
+    environment:
+      PORT: 17010
+      MYSQL_URI: "mysql+pymysql://api:test@database:17011/main"
     volumes:
-      - type: bind
-        source: ./MoneyAPI
-        target: /app
+      - ./users:/app
     ports:
-      - 17002:17002
+      - "17010:17010"
     depends_on:
       database:
         condition: service_healthy
-
-networks:
-  main:
