@@ -1,5 +1,5 @@
-from . import app
+from init import app
 
-@app.route('/')
-def index():
+@app.get('/')
+async def root():
     return {'test': True}

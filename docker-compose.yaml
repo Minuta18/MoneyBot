@@ -21,7 +21,9 @@ services:
       timeout: 10s
       retries: 10
   users-api:
-    build: ./users/Dockerfile
+    build:
+      context: ./
+      dockerfile: ./users/Dockerfile
     restart: on-failure
     environment:
       PORT: 17010
