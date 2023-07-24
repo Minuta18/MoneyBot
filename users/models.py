@@ -1,5 +1,5 @@
 from sqlalchemy import  Column, Integer, String, Boolean
-from init import Base
+from init import Base, engine
 
 class User(Base):
     __tablename__ = 'users'
@@ -9,3 +9,5 @@ class User(Base):
     hashed_password = Column(String(255))
 
     is_banned = Column(Boolean)
+
+Base.metadata.create_all(bind=engine)
