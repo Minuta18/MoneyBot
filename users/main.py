@@ -2,12 +2,15 @@ from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from fastapi import Depends
+from passlib.context import CryptContext
 import uvicorn, os
 from init import engine, Base, get_db
 import crud
-from models import User
+import models
+import shemas
 
 app = FastAPI()
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 @app.on_event('startup')
 async def init():
@@ -29,6 +32,17 @@ async def get_user(user_id: int, db: Session = Depends(get_db)):
         'error': False,
         'id': usr.id,
         'email': usr.email,
+        'is_banned': usr.is_banned,
+    }
+
+@app.post('/user/create')
+async def create(user_create: shemas.UserCreateShema, db: Session = Depends(get_db)):
+    usr = crud.create_user(db, user_create.email, pwd_context.hash(user_create.password))
+    return {
+        'error': False,
+        'id': usr.id,
+        'email': usr.email,
+        'hashed_password': usr.hashed_password,
         'is_banned': usr.is_banned,
     }
 

@@ -8,6 +8,6 @@ class User(Base):
     email = Column(String(255), unique=True)
     hashed_password = Column(String(255))
 
-    is_banned = Column(Boolean)
+    is_banned = Column(Boolean, default=False)
 
 Base.metadata.create_all(bind=engine)

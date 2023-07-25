@@ -20,18 +20,18 @@ services:
       interval: 10s
       timeout: 10s
       retries: 10
-  users-api:
-    build:
-      context: ./
-      dockerfile: ./users/Dockerfile
-    restart: on-failure
-    environment:
-      PORT: 17010
-      MYSQL_URI: "mysql+pymysql://api:test@database:17011/main"
-    volumes:
-      - ./users:/app
-    ports:
-      - "17010:17010"
-    depends_on:
-      database:
-        condition: service_healthy
+  # users-api:
+  #   build:
+  #     context: ./
+  #     dockerfile: ./users/Dockerfile
+  #   restart: on-failure
+  #   environment:
+  #     PORT: 17010
+  #     MYSQL_URI: "mysql+pymysql://api:test@database:17011/main"
+  #   volumes:
+  #     - ./users:/app
+  #   ports:
+  #     - "17010:17010"
+  #   depends_on:
+  #     database:
+  #       condition: service_healthy
