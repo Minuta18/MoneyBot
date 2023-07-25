@@ -16,7 +16,7 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 async def init():
     Base.metadata.create_all(bind=engine)
 
-@app.get('/user/{user_id}')
+@app.get('/users/{user_id}')
 async def get_user(user_id: int, db: Session = Depends(get_db)):
     usr = crud.get_user(db, user_id)
     if usr == None:
@@ -35,7 +35,20 @@ async def get_user(user_id: int, db: Session = Depends(get_db)):
         'is_banned': usr.is_banned,
     }
 
-@app.post('/user/create')
+@app.get('/users')
+async def users_list(page: int=1, page_size: int=20, db: Session = Depends(get_db)):
+    return {
+        'error': False,
+        'page': page,
+        'page_size': page_size,
+        'users': [{
+            'id': usr.id,
+            'email': usr.email,
+            'is_banned': usr.is_banned,
+        } for usr in crud.get_users(db, page=page, page_limit=page_size)],
+    }
+
+@app.post('/users/create')
 async def create(user_create: shemas.UserCreateShema, db: Session = Depends(get_db)):
     usr = crud.create_user(db, user_create.email, pwd_context.hash(user_create.password))
     return {
