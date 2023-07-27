@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 from fastapi import Depends
 from passlib.context import CryptContext
 import uvicorn, os
@@ -18,6 +19,7 @@ async def init():
 
 @app.get('/users/{user_id}')
 async def get_user(user_id: int, db: Session = Depends(get_db)):
+    '''Returns a user by id'''
     usr = crud.get_user(db, user_id)
     if usr == None:
         return JSONResponse(
@@ -37,6 +39,7 @@ async def get_user(user_id: int, db: Session = Depends(get_db)):
 
 @app.get('/users')
 async def users_list(page: int=1, page_size: int=20, db: Session = Depends(get_db)):
+    '''Returns a list of users'''
     return {
         'error': False,
         'page': page,
@@ -50,7 +53,18 @@ async def users_list(page: int=1, page_size: int=20, db: Session = Depends(get_d
 
 @app.post('/users/create')
 async def create(user_create: shemas.UserCreateShema, db: Session = Depends(get_db)):
-    usr = crud.create_user(db, user_create.email, pwd_context.hash(user_create.password))
+    '''Creates a user'''
+    try:
+        usr = crud.create_user(db, user_create.email, pwd_context.hash(user_create.password))
+    except IntegrityError:
+        return JSONResponse(
+            status_code=400,
+            content={
+                'error': True,
+                'message': 'User already exists',
+                'code': 2,
+            }
+        )
     return {
         'error': False,
         'id': usr.id,
@@ -58,6 +72,10 @@ async def create(user_create: shemas.UserCreateShema, db: Session = Depends(get_
         'hashed_password': usr.hashed_password,
         'is_banned': usr.is_banned,
     }
+
+@app.put('/users/{user_id}/edit')
+async def edit():
+    ...
 
 if __name__ == '__main__':
     uvicorn.run('main:app', 

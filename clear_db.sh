@@ -1,0 +1,1 @@
+mysql -h 127.0.0.1 -P 17011 -p test -D main -u root -e "DROP DATABASE test; CREATE DATABASE test; "
