@@ -74,8 +74,43 @@ async def create(user_create: shemas.UserCreateShema, db: Session = Depends(get_
     }
 
 @app.put('/users/{user_id}/edit')
-async def edit():
-    ...
+async def edit(user_id: int, user_edit: shemas.UserEditShema, db: Session = Depends(get_db)):
+    try:
+        usr = crud.get_user(db, user_id)
+        
+        if not pwd_context.verify(user_edit.password, usr.hashed_password):
+            return JSONResponse(
+                status_code=403,
+                content={
+                    'error': True,
+                    'message': 'Invalid password',
+                    'code': 4,
+                }
+            )
+
+        if usr == None:
+            return JSONResponse(
+                status_code=404,
+                content={
+                    'error': True,
+                    'message': 'User not found',
+                    'code': 1,
+                }
+            )
+        
+        crud.edit_user(db, usr, user_edit.new_email, pwd_context.hash(user_edit.new_password))
+        return {
+            'error': False,
+        }
+    except IntegrityError:
+        return JSONResponse(
+            status_code=400,
+            content={
+                'error': True,
+                'message': 'User\'s email already exists',
+                'code': 2,
+            }
+        )
 
 if __name__ == '__main__':
     uvicorn.run('main:app', 

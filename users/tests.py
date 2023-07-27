@@ -73,3 +73,36 @@ def test_404():
             'message': 'User not found',
             'code': 1
         }
+
+def test_edit():
+    responce = client.post('/users/create', json={
+        'email': 'testing_email_10@popusk.heh',
+        'password': 'test',
+    })
+    user_data = responce.json()
+    user_id = user_data['id']
+    edit_responce = client.put(f'/users/{user_id}/edit', json={
+        'password': 'test',
+        'new_password': 'test',
+        'new_email': 'testing_email_11@popusk.heh',
+    })
+    assert edit_responce.status_code == 200
+    user_data = client.get(f'/users/{user_id}').json()
+    assert user_data['email'] == 'testing_email_11@popusk.heh'
+
+    edit_responce = client.put(f'/users/{user_id}/edit', json={
+        'password': 'test',
+        'new_password': 'test2',
+        'new_email': 'testing_email_11@popusk.heh',
+    })
+    edit_responce = client.put(f'/users/{user_id}/edit', json={
+        'password': 'test',
+        'new_password': 'test2',
+        'new_email': 'testing_email_11@popusk.heh',
+    })
+    assert edit_responce.status_code == 403
+    assert edit_responce.json() == {
+        'error': True,
+        'message': 'Invalid password',
+        'code': 4,
+    }

@@ -17,3 +17,13 @@ def create_user(db: Session, email: str=None, hashed_password: str=None) -> mode
     db.refresh(new_user)
 
     return new_user
+
+def edit_user(db: Session, user: models.User, email: str, hashed_password: str):
+    user.email = email
+    user.hashed_password = hashed_password
+    
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+
+    return user
