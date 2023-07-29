@@ -17,21 +17,46 @@ services:
       - ./mySQLData:/var/lib/mysql
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:17011"]
-      interval: 10s
+      interval: 5s
       timeout: 10s
       retries: 10
-  # users-api:
+
+  # balance-api:
   #   build:
   #     context: ./
-  #     dockerfile: ./users/Dockerfile
+  #     dockerfile: ./balance/Dockerfile
   #   restart: on-failure
   #   environment:
-  #     PORT: 17010
-  #     MYSQL_URI: "mysql+pymysql://api:test@database:17011/main"
+  #     PORT: 17012
+  #     MYSQL_URI: "mysql+pymysql://root:test@database:17011/main"
+  #     TESTING_URI: "mysql+pymysql://root:test@database:17011/test"
+  #     TESTING: false
+  #     SQLALCHEMY_WARN_20: 1
   #   volumes:
-  #     - ./users:/app
+  #     - ./balance:/app
   #   ports:
-  #     - "17010:17010"
+  #     - "17012:17012"
   #   depends_on:
   #     database:
   #       condition: service_healthy
+
+  users-api:
+    build:
+      context: ./
+      dockerfile: ./users/Dockerfile
+    restart: on-failure
+    environment:
+      PORT: 17010
+      MYSQL_URI: "mysql+pymysql://root:test@database:17011/main"
+      TESTING_URI: "mysql+pymysql://root:test@database:17011/test"
+      TESTING: false
+      SQLALCHEMY_WARN_20: 1
+    volumes:
+      - ./users:/app
+    ports:
+      - "17010:17010"
+    depends_on:
+      # balance-api:
+      #   condition: service_started
+      database:
+        condition: service_healthy

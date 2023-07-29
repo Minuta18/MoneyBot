@@ -5,7 +5,7 @@ from sqlalchemy.exc import IntegrityError
 from fastapi import Depends
 from passlib.context import CryptContext
 import uvicorn, os
-from init import engine, Base, get_db
+from init import engine, Base, get_db, DATABASE_URI
 import crud
 import models
 import shemas
@@ -16,6 +16,14 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 @app.on_event('startup')
 async def init():
     Base.metadata.create_all(bind=engine)
+
+@app.get('/')
+async def root():
+    return {
+        'error': False,
+        'version': '0.4.1',
+        'component_version': '0.4.0',
+    }
 
 @app.get('/users/{user_id}')
 async def get_user(user_id: int, db: Session = Depends(get_db)):

@@ -4,10 +4,10 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-if not os.environ.get('TESTING', default=True):
-    DATABASE_URI = os.environ.get('DATABASE_URI', default='mysql+pymysql://root:test@127.0.0.1:17011/main')
+if os.environ.get('TESTING', default=True):
+    DATABASE_URI = os.environ.get('MYSQL_URI', default='mysql+pymysql://root:test@127.0.0.1:17011/test')
 else:
-    DATABASE_URI = os.environ.get('DATABASE_URI', default='mysql+pymysql://root:test@127.0.0.1:17011/test')
+    DATABASE_URI = os.environ.get('TESTING_URI', default='mysql+pymysql://root:test@127.0.0.1:17011/main')
 
 engine = create_engine(DATABASE_URI)
 SessionLocal = sessionmaker(bind=engine)
