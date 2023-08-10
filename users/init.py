@@ -9,6 +9,8 @@ if os.environ.get('TESTING', default=True):
 else:
     DATABASE_URI = os.environ.get('TESTING_URI', default='mysql+pymysql://root:test@127.0.0.1:17011/main')
 
+BALANCES_URI = os.environ.get('BALANCES_URL', default='http://localhost:17012/api/v1/balances')
+
 engine = create_engine(DATABASE_URI)
 SessionLocal = sessionmaker(bind=engine)
 Base = declarative_base()

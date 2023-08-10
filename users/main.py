@@ -1,31 +1,27 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, APIRouter
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from fastapi import Depends
 from passlib.context import CryptContext
-import uvicorn, os
+import uvicorn
+import os
 from init import engine, Base, get_db, DATABASE_URI
+from shared_components import requests
+import init
 import crud
 import models
 import shemas
 
-app = FastAPI()
+app = FastAPI(openapi_url='/api/v1/users/openapi.json', docs_url='/api/v1/users/docs')
+router = APIRouter(prefix='/api/v1/users')
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 @app.on_event('startup')
-async def init():
+async def init_():
     Base.metadata.create_all(bind=engine)
 
-@app.get('/')
-async def root():
-    return {
-        'error': False,
-        'version': '0.4.1',
-        'component_version': '0.4.0',
-    }
-
-@app.get('/users/{user_id}')
+@router.get('/{user_id}')
 async def get_user(user_id: int, db: Session = Depends(get_db)):
     '''Returns a user by id'''
     usr = crud.get_user(db, user_id)
@@ -45,7 +41,7 @@ async def get_user(user_id: int, db: Session = Depends(get_db)):
         'is_banned': usr.is_banned,
     }
 
-@app.get('/users')
+@router.get('/')
 async def users_list(page: int=1, page_size: int=20, db: Session = Depends(get_db)):
     '''Returns a list of users'''
     return {
@@ -59,7 +55,7 @@ async def users_list(page: int=1, page_size: int=20, db: Session = Depends(get_d
         } for usr in crud.get_users(db, page=page, page_limit=page_size)],
     }
 
-@app.post('/users/create')
+@router.post('/create')
 async def create(user_create: shemas.UserCreateShema, db: Session = Depends(get_db)):
     '''Creates a user'''
     try:
@@ -73,6 +69,27 @@ async def create(user_create: shemas.UserCreateShema, db: Session = Depends(get_
                 'code': 2,
             }
         )
+
+    maker = requests.RequestMaker()
+    balance = maker.post(f'{init.BALANCES_URI}/create', json={
+        'user_id': usr.id,
+    }, timeout=2)
+
+    # balance = requests.RequestMaker().post(f'{init.BALANCES_URI}/create', json={
+    #     'user_id': usr.id,
+    # }, timeout=5)
+
+    if balance.status_code != 200:
+        crud.delete_user(db, usr.id)
+        return JSONResponse(
+            status_code=balance.status_code,
+            content={
+                'error': True,
+                'message': 'Something went wrong while creating balance',
+                'code': 5,
+            }
+        )
+
     return {
         'error': False,
         'id': usr.id,
@@ -81,7 +98,7 @@ async def create(user_create: shemas.UserCreateShema, db: Session = Depends(get_
         'is_banned': usr.is_banned,
     }
 
-@app.put('/users/{user_id}/edit')
+@router.put('/{user_id}/edit')
 async def edit(user_id: int, user_edit: shemas.UserEditShema, db: Session = Depends(get_db)):
     try:
         usr = crud.get_user(db, user_id)
@@ -120,9 +137,11 @@ async def edit(user_id: int, user_edit: shemas.UserEditShema, db: Session = Depe
             }
         )
 
+app.include_router(router)
+
 if __name__ == '__main__':
     uvicorn.run('main:app', 
-        port=int(os.environ.get('PORT', default=17010)), 
+        port=int(os.environ.get('PORT', default=17013)), 
         host=os.environ.get('HOST', default='0.0.0.0'), 
         log_level='info'
-    ) #
+    )

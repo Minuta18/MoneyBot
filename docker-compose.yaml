@@ -13,6 +13,8 @@ services:
       MYSQL_TCP_PORT: 17011
     ports:
       - "17011:17011"
+    expose:
+      - 17011
     volumes:
       - ./mySQLData:/var/lib/mysql
     healthcheck:
@@ -20,43 +22,54 @@ services:
       interval: 5s
       timeout: 10s
       retries: 10
+    networks:
+      - services
 
-  # balance-api:
-  #   build:
-  #     context: ./
-  #     dockerfile: ./balance/Dockerfile
-  #   restart: on-failure
-  #   environment:
-  #     PORT: 17012
-  #     MYSQL_URI: "mysql+pymysql://root:test@database:17011/main"
-  #     TESTING_URI: "mysql+pymysql://root:test@database:17011/test"
-  #     TESTING: false
-  #     SQLALCHEMY_WARN_20: 1
-  #   volumes:
-  #     - ./balance:/app
-  #   ports:
-  #     - "17012:17012"
-  #   depends_on:
-  #     database:
-  #       condition: service_healthy
+  balance-api:
+    build:
+      context: ./
+      dockerfile: ./balances-api-dockerfile
+    restart: on-failure
+    environment:
+      PORT: 17012
+      HOST: "balance-api"
+      MYSQL_URI: "mysql+pymysql://root:test@database:17011/main"
+      TESTING_URI: "mysql+pymysql://root:test@database:17011/test"
+      USERS_SERVICE_URL: "http://users-api:17010/api/v1/users"
+      TESTING: true
+      SQLALCHEMY_WARN_20: 1
+    ports:
+      - "17012:17012"
+    expose:
+      - 17012
+    depends_on:
+      users-api:
+        condition: service_started
+    networks:
+      - services
 
   users-api:
     build:
       context: ./
-      dockerfile: ./users/Dockerfile
+      dockerfile: ./users-api-dockerfile
     restart: on-failure
     environment:
       PORT: 17010
+      HOST: "users-api"
       MYSQL_URI: "mysql+pymysql://root:test@database:17011/main"
       TESTING_URI: "mysql+pymysql://root:test@database:17011/test"
-      TESTING: false
+      BALANCES_URL: "http://balance-api:17012/api/v1/balances"
+      TESTING: true
       SQLALCHEMY_WARN_20: 1
-    volumes:
-      - ./users:/app
     ports:
       - "17010:17010"
+    expose:
+      - 17010
     depends_on:
-      # balance-api:
-      #   condition: service_started
       database:
         condition: service_healthy
+    networks:
+      - services
+
+networks:
+  services:
