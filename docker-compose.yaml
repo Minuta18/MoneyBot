@@ -1,75 +1,69 @@
-version: "3.8"
+version: '3.8'
+
+# Ports:
+# 17010       - MySQL database
+# 17011       - Nginx
+# 17012-17013 - Services
 
 services:
   database:
+    # MySQL database for all services
+
     image: mysql:8.0
     restart: always
     environment:
       DB_HOST: .
-      MYSQL_DATABASE: "main"
-      MYSQL_ROOT_PASSWORD: "test"
-      MYSQL_USER: "api"
-      MYSQL_PASSWORD: "test"
-      MYSQL_TCP_PORT: 17011
+      MYSQL_DATABASE: "main" # Database to use in production
+      MYSQL_USER: "api" # User which services will use 
+      MYSQL_PASSWORD: "test" # Password for MYSQL_USER
+      MYSQL_ROOT_PASSWORD: "test" # Password for ROOT
+      MYSQL_TCP_PORT: 17010 # Custom port, because 3306 is always busy
     ports:
-      - "17011:17011"
-    expose:
-      - 17011
+      - 17010:17010
     volumes:
-      - ./mySQLData:/var/lib/mysql
+      - ./mySQLdata:/var/lib/mySQL # Saving data to folder "mySQLdata",
+                                   # it can removed using sudo rm -rf ./mySQLdata
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:17011"]
+      # Services which use database should start only after healthcheck. 
+      # Otherwise they will throw an error
+      test: ["CMD", "curl", "-f", "http://localhost:17010"]
       interval: 5s
       timeout: 10s
-      retries: 10
-    networks:
-      - services
+      retries: 5
 
-  balance-api:
-    build:
-      context: ./
-      dockerfile: ./balances-api-dockerfile
-    restart: on-failure
-    environment:
-      PORT: 17012
-      HOST: "balance-api"
-      MYSQL_URI: "mysql+pymysql://root:test@database:17011/main"
-      TESTING_URI: "mysql+pymysql://root:test@database:17011/test"
-      USERS_SERVICE_URL: "http://users-api:17010/api/v1/users"
-      TESTING: true
-      SQLALCHEMY_WARN_20: 1
+  nginx:
+    # Nginx is used to merge users-api and balances-api in one address and port
+    # /api/v2/users - users-api
+    # /api/v2/balances - balances-api
+
+    image: nginx:latest
     ports:
-      - "17012:17012"
-    expose:
-      - 17012
+      - 17011:8080 # Custom port, because 8080 is always busy
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf # Nginx config
     depends_on:
-      users-api:
-        condition: service_started
-    networks:
-      - services
+      - users-api # Nginx will run only after services
+
 
   users-api:
-    build:
+    # Service to manage users and check user's password
+
+    build: 
       context: ./
-      dockerfile: ./users-api-dockerfile
-    restart: on-failure
+      dockerfile: ./users/Dockerfile
+    restart: on-failure # Services must not stopped due to errors
+    command: uvicorn users.main:app --reload --host 0.0.0.0 --port 8000
     environment:
-      PORT: 17010
-      HOST: "users-api"
-      MYSQL_URI: "mysql+pymysql://root:test@database:17011/main"
-      TESTING_URI: "mysql+pymysql://root:test@database:17011/test"
-      BALANCES_URL: "http://balance-api:17012/api/v1/balances"
+      DB_HOST: "database"
+      DB_PORT: 17010
+      DB_USER: "api"
+      DB_PASSWORD: "test"
+      DB_MAIN: "main"
+      DB_TEST: "test"
       TESTING: true
-      SQLALCHEMY_WARN_20: 1
+      PREFIX: "/api/v2"
     ports:
-      - "17010:17010"
-    expose:
-      - 17010
+      - 17012:8000
     depends_on:
       database:
-        condition: service_healthy
-    networks:
-      - services
-
-networks:
-  services:
+        condition: service_healthy # Starting only after DB
