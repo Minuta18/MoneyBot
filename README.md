@@ -40,7 +40,7 @@ Response body:
 }
 ```
 
-> ![WARNING]
+> [!WARNING]
 > This method is not written yet
 
 P. S. I will add more descriptions soon.
