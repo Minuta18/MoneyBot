@@ -1,0 +1,8 @@
+# There are many files which are can created with requirements.txt
+.venv
+
+# Testing database useless
+mySQLdata
+
+# cache
+__pycache__

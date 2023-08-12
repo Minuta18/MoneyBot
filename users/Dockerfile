@@ -5,4 +5,4 @@ WORKDIR /app
 COPY requirements.txt /app/requirements.txt
 RUN pip install --upgrade -r requirements.txt
 
-COPY ./users /app/
+COPY ./users/ /app/

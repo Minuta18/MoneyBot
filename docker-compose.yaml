@@ -52,7 +52,7 @@ services:
       context: ./
       dockerfile: ./users/Dockerfile
     restart: on-failure # Services must not stopped due to errors
-    command: uvicorn users.main:app --reload --host 0.0.0.0 --port 8000
+    command: uvicorn main:app --reload --host 0.0.0.0 --port 8000
     environment:
       DB_HOST: "database"
       DB_PORT: 17010
