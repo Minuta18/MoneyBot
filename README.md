@@ -41,6 +41,6 @@ Response body:
 ```
 
 > [!WARNING]
-> This method is not written yet
+> This method has not been written yet
 
 P. S. I will add more descriptions soon.
