@@ -40,6 +40,13 @@ Response body:
 }
 ```
 
+Possible errors are:
+
+```json
+User with this email already exists
+
+```
+
 > [!WARNING]
 > This method has not been written yet
 
