@@ -6,7 +6,7 @@ from sqlalchemy import orm
 PREFIX = environ.get('PREFIX', default='/api')
 TESTING = environ.get('TESTING', default=False)
 
-DATABASE_URL = 'mysql+tormysql://{}:{}@{}:{}/{}'.format(
+DATABASE_URL = 'mysql+aiomysql://{}:{}@{}:{}/{}'.format(
     environ.get('DB_USER', default='root'),  # Root is always exists
     ':' + environ.get('DB_PASSWORD') if environ.get('DB_PASSWORD') is not \
     None else '',

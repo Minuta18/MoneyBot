@@ -9,7 +9,7 @@ MoneyBot is a simple economy telegram bot. I am creating this project to learn s
 - [ ] Unit tests for at least 80% of code (now - ~0%)
 - [X] Documentation of all methods using docstrings
 - [X] Start using linters
-- [ ] Correctly configure Nginx
+- [X] Correctly configure Nginx
 - [X] Docker compose
 - [ ] Swagger
 - [X] Asynchronous services

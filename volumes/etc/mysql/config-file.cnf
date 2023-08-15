@@ -1,0 +1,22 @@
+[mysqld]
+port = 17010
+wait_timeout = 9000000
+max_allowed_packet = 1024M
+innodb_buffer_pool_size = 512M
+innodb_log_buffer_size = 256M
+innodb_log_file_size = 256M
+innodb_write_io_threads = 16
+innodb_flush_log_at_trx_commit = 0
+net_read_timeout=500
+net_write_timeout=500
+interactive_timeout=600
+connect_timeout=500
+skip-log-bin
+# Slow query settings:
+slow_query_log=1
+slow_query_log_file=/var/log/mysql/slow.log
+long_query_time=2
+# Error query settings:
+log_error=/var/log/mysql/mysql_error.log
+general_log_file=/var/log/mysql/mysql.log
+general_log=1
