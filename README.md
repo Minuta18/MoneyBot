@@ -43,7 +43,7 @@ Response body:
 Possible errors are:
 
 ```json
-User with this email already exists
+User with this email already exists.
 
 ```
 
