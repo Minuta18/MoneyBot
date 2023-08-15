@@ -14,6 +14,7 @@ MoneyBot is a simple economy telegram bot. I am creating this project to learn s
 - [ ] Swagger
 - [X] Asynchronous services
 - [X] Restful API
+- [ ] Logging
   
 ## API method list
 

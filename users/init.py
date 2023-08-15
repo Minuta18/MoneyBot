@@ -2,6 +2,7 @@ from os import environ
 from sqlalchemy.ext import declarative
 from sqlalchemy.ext import asyncio
 from sqlalchemy import orm
+import logging
 
 PREFIX = environ.get('PREFIX', default='/api')
 TESTING = environ.get('TESTING', default=False)
@@ -23,7 +24,9 @@ DOCS_URL = '{}/users/docs'.format(PREFIX)
 engine = asyncio.create_async_engine(DATABASE_URL, echo=True)
 base = declarative.declarative_base()
 session = orm.sessionmaker(
-    bind=engine, 
-    class_=asyncio.AsyncSession, 
+    bind=engine,
+    class_=asyncio.AsyncSession,
     expire_on_commit=False
 )
+
+logger = logging.getLogger(__name__)

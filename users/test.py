@@ -9,4 +9,4 @@ def health_check_test():
     response = client.get(f'{init.PREFIX}/users/health_check')
 
     assert response.status_code == 200
-    assert response.json()['error'] == False
+    assert not response.json()['error']
