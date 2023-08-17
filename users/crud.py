@@ -52,11 +52,72 @@ async def create_user(
     except exc.IntegrityError:
         raise ValueError('Email already used')
 
-async def get_user():
-    ...
+async def get_user(db: asyncio.AsyncSession, user_id: int = ...):
+    '''
+    Gets one user by id
 
-async def update_user():
-    ...
+    :param db: Database session
+    :param user_id: User's id
+    :return: User or None if user is not exists
+    '''
+    return db.get(models.User, user_id)
 
-async def delete_user():
-    ...
+async def get_users(
+            db: asyncio.AsyncSession,
+            start_id: int = ...,
+            end_id: int = ...,
+        ):
+    '''
+    Gets multiple users with ids start_id..end_id
+
+    :param db: Database session
+    :param start_id: id of first user
+    :param end_id: id of last user
+    :return: List of users
+    '''
+    return db.query(models.User).offset(start_id).limit(
+        abs(end_id - start_id) + 1).all()
+
+async def update_user(
+            db: asyncio.AsyncSession,
+            user: models.User,
+            email: str = ...,
+            hashed_password: str = ...,
+        ) -> models.User:
+    '''
+    Gets multiple users with ids start_id..end_id
+
+    :param db: Database session
+    :param user: User to edit
+    :param email: New email
+    :param hashed_password: New password
+    :return: Edited user
+    '''
+    user.email = email
+    user.hashed_password = hashed_password
+
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+
+    return user
+
+async def delete_user(
+            db: asyncio.AsyncSession,
+            user_id: int = ...,
+        ) -> models.User:
+    '''
+    Deletes user by given id, raises ValueError if user doesn't exists.
+
+    :param db: Database session
+    :param user_id: Id user to delete
+    :return: Deleted user
+    '''
+    user = await get_user(db, user_id=user_id)
+    if user is None:
+        raise ValueError(f'Can\'t found user with id {user_id}')
+
+    db.delete(user)
+    db.commit()
+
+    return user
