@@ -6,7 +6,7 @@ MoneyBot is a simple economy telegram bot. I am creating this project to learn s
   - [ ] Auth service
   - [ ] Balance service
   - [ ] Telegram bot service
-- [X] Unit tests for at least 80% of code (now - ~100%, testing only api methods)
+- [X] Unit tests for at least 80% of code
 - [X] Documentation of all methods using docstrings
 - [X] Start using linters
 - [X] Correctly configure Nginx
@@ -15,6 +15,8 @@ MoneyBot is a simple economy telegram bot. I am creating this project to learn s
 - [X] Asynchronous services
 - [X] Restful API
 - [ ] Logging
+- [X] Test-driven development
+- [ ] HTTPS
   
 ## API method list
 
