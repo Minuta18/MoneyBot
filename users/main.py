@@ -32,18 +32,14 @@ async def startup_event():
 
 @app.on_event('shutdown')
 async def shutdown_event():
-    async with init.engine.begin() as conn:
-        await conn.close()
+    await init.engine.dispose()
 
 @router.get('/health')
-async def health_check(request: fastapi.Request):
+async def health_check():
     '''
     Health check can be used to check if service is available and
     can accept connections
     '''
-
-    init.logging.info('Checked service health by ' +
-                      f'{request.client.host}:{request.client.port}')
 
     return {
         'error': False,

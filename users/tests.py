@@ -1,24 +1,26 @@
 from fastapi import testclient
 import main
 import init
-import os
+import pytest
+import httpx
 
-client = testclient.TestClient(main.app)
+client = httpx.AsyncClient(app=main.app, base_url=f'http://127.0.0.1:17012{init.PREFIX}')
 
-def test_health_check():
-    '''Test of health check'''
+@pytest.mark.anyio
+@pytest.mark.order(1)
+async def test_health_check():
     # print(os.environ.get('DB_HOST'), init.DATABASE_URL)
 
-    response = client.get(f'{init.PREFIX}/users/health_check')
+    response = await client.get('users/health')
+    print(response.url, response.status_code, response.content)
 
     assert response.status_code == 200
     assert not response.json()['error']
 
-def test_create_and_read():
-    '''Test of creating and reading user'''
-
-    # Testing getting single user
-    response = client.get(f'{init.PREFIX}/users/1000')
+@pytest.mark.anyio
+@pytest.mark.order(2)
+async def test_user_not_found():
+    response = await client.get('users/1000')
     assert response.status_code == 404
 
     response_json = response.json()
@@ -26,8 +28,11 @@ def test_create_and_read():
     assert response_json['code'] == 1
     assert response_json['message'] == 'User not found'
 
-    # Testing getting multiple users
-    response = client.get(f'{init.PREFIX}/users')
+@pytest.mark.anyio
+@pytest.mark.order(3)
+async def test_get_users():
+    response = await client.get('users')
+    print(response.url, response.status_code, response.content)
     assert response.status_code == 200
 
     response_json = response.json()
@@ -36,12 +41,14 @@ def test_create_and_read():
     assert response_json['page_size'] == 20
     assert response_json['users'] == []
 
-    # Testing user creating (main case)
-    responce = client.get(f'{init.PREFIX}/users/create', json={
+@pytest.mark.anyio
+@pytest.mark.order(4)
+async def test_create():
+    response = await client.post('users/create', json={
         'email': 'sam_takoy@ti_tupoy.com',
         'password': 'Loohi123',
     })
-    assert responce.status_code == 201
+    assert response.status_code == 201
 
     response_json = response.json()
     assert response_json['error'] == False
@@ -50,36 +57,42 @@ def test_create_and_read():
     assert response_json['is_banned'] == False
     assert response_json['balance'] == 0
 
-    # Testing user creating (user already exists)
-    responce = client.post(f'{init.PREFIX}/users/create', json={
+@pytest.mark.anyio
+@pytest.mark.order(5)
+async def test_create_existing_user():
+    response = await client.post('users/create', json={
         'email': 'sam_takoy@ti_tupoy.com',
         'password': 'Loohi123',
     })
-    assert responce.status_code == 400
+    assert response.status_code == 400
 
     response_json = response.json()
     assert response_json['error'] == True
     assert response_json['code'] == 2
     assert response_json['message'] == 'User already exists'
 
-    # Testing getting user
-    responce = client.get(f'{init.PREFIX}/users/1')
-    assert responce.status_code == 200
+@pytest.mark.anyio
+@pytest.mark.order(6)
+async def test_getting_user():
+    response = await client.get('users/1')
+    assert response.status_code == 200
 
-    response_json = responce.json()
+    response_json = response.json()
     assert response_json['error'] == False
     assert response_json['id'] == 1
     assert response_json['email'] == 'sam_takoy@ti_tupoy.com'
     assert response_json['is_banned'] == False
     assert response_json['balance'] == 0
 
-    # Testing getting users
-    responce = client.get(f'{init.PREFIX}/users/')
-    assert responce.status_code == 200
+@pytest.mark.anyio
+@pytest.mark.order(7)
+async def test_getting_users():
+    response = await client.get('users/')
+    assert response.status_code == 200
 
-    responce_json = responce.json()
-    assert responce_json['error'] == False
-    assert responce_json == {
+    response_json = response.json()
+    assert response_json['error'] == False
+    assert response_json == {
         'error': False,
         'page': 1,
         'page_size': 20,
