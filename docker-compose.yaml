@@ -10,7 +10,6 @@ services:
     # MySQL database for all services
 
     image: mysql:8.0
-    restart: always
     environment:
       DB_HOST: .
       MYSQL_DATABASE: "main"
@@ -21,7 +20,7 @@ services:
     ports:
       - "17010:17010"
     volumes:
-      - ./volumes/mySQLdata:/var/lib/mySQL # Saving data to folder "mySQLdata",
+      - ./volumes/mySQLdata:/var/lib/mysql # Saving data to folder "mySQLdata",
                                    # it can removed using sudo rm -rf ./mySQLdata
     healthcheck:
       # Services which use database should start only after healthcheck. 

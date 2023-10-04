@@ -75,13 +75,9 @@ async def get_users(
     :return: List of users
     '''
 
-    # print(await db.execute(sql.select(models.User).offset(start_id).limit(
-    #     abs(end_id - start_id) + 1
-    # )))
-
-    return await db.execute(sql.select(models.User).offset(start_id).limit(
+    return (await db.execute(sql.select(models.User).offset(start_id).limit(
         abs(end_id - start_id) + 1
-    ))
+    ))).scalars().all()
 
 async def update_user(
             db: asyncio.AsyncSession,

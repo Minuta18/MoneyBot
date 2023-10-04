@@ -72,7 +72,7 @@ async def get_user(
         'balance': 0,
     }
 
-@router.get('/')
+@router.get('')
 async def get_users(
             page: int = 1,
             page_size: int = 20,
@@ -87,6 +87,19 @@ async def get_users(
         start_id=((page - 1) * page_size), 
         end_id=((page - 1) * page_size)
     )
+
+    print({
+        'error': False,
+        'page': 1,
+        'page_size': 20,
+        'users': [{
+            'id': user.id,
+            'email': user.email,
+            'is_banned': user.is_banned,
+            'balance': 0,
+        } for user in users],
+    }
+)
 
     return {
         'error': False,
