@@ -1,5 +1,5 @@
 # There are many files which are can created with requirements.txt
-.venv
+.venv/
 
 # Testing database useless
 mySQLdata
@@ -10,3 +10,5 @@ __pycache__
 
 # Settings
 .vscode
+
+.venv
