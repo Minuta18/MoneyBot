@@ -1,8 +1,8 @@
 from sqlalchemy.ext import asyncio
 from sqlalchemy import exc
+from app import models
 import sqlalchemy as sql
-import init
-import models
+import app
 
 async def get_session() -> asyncio.AsyncSession:
     '''
@@ -11,7 +11,7 @@ async def get_session() -> asyncio.AsyncSession:
     :return: a `asyncio.AsyncSession`
     '''
 
-    async with init.session() as session:
+    async with app.session() as session:
         yield session
 
 async def init_models():
@@ -19,9 +19,9 @@ async def init_models():
     This function drop and create all tables
     '''
 
-    async with init.engine.begin() as conn:
-        await conn.run_sync(init.base.metadata.drop_all)
-        await conn.run_sync(init.base.metadata.create_all)
+    async with app.engine.begin() as conn:
+        await conn.run_sync(app.base.metadata.drop_all)
+        await conn.run_sync(app.base.metadata.create_all)
 
 async def create_user(
             db: asyncio.AsyncSession,

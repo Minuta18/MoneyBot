@@ -3,12 +3,9 @@ from sqlalchemy.ext import declarative
 from sqlalchemy.ext import asyncio
 from sqlalchemy import orm
 import logging
-import dotenv
-
-dotenv.load_dotenv()
 
 PREFIX = environ.get('PREFIX', default='/api')
-TESTING = environ.get('TESTING', default='False') == 'True'
+TESTING = environ.get('TESTING', default='false') == 'true'
 
 DATABASE_URL = 'mysql+aiomysql://{}:{}@{}:{}/{}'.format(
     environ.get('DB_USER', default='root'),  # Root is always exists

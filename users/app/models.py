@@ -1,8 +1,7 @@
 import sqlalchemy as sql
-import init
-import asyncio
+import app
 
-class User(init.base):
+class User(app.base):
     __tablename__ = 'users'
 
     id = sql.Column(sql.Integer, primary_key=True, index=True)

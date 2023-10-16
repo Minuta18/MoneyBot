@@ -56,7 +56,7 @@ services:
       context: ./
       dockerfile: ./users/Dockerfile
     restart: on-failure
-    command: uvicorn main:app --reload --host 0.0.0.0 --port 17012
+    command: uvicorn main:my_app --reload --host 0.0.0.0 --port 17012
     environment:
       DB_HOST: "database"
       DB_PORT: 17010

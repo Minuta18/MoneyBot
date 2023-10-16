@@ -1,10 +1,13 @@
-from fastapi import testclient
 import main
-import init
+import app
 import pytest
 import httpx
+from app import views
 
-client = httpx.AsyncClient(app=main.app, base_url=f'http://127.0.0.1:17012{init.PREFIX}')
+views.destroy_models()
+views.init_models()
+
+client = httpx.AsyncClient(app=main.app, base_url=f'http://127.0.0.1:17012{app.PREFIX}')
 
 @pytest.mark.anyio
 @pytest.mark.order(1)
