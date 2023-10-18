@@ -3,6 +3,9 @@ from sqlalchemy.ext import declarative
 from sqlalchemy.ext import asyncio
 from sqlalchemy import orm
 import logging
+import dotenv
+
+dotenv.load_dotenv('./.env')
 
 PREFIX = environ.get('PREFIX', default='/api')
 TESTING = environ.get('TESTING', default='false') == 'true'

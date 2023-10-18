@@ -60,6 +60,7 @@ async def get_user(
         'error': False,
         'id': user.id,
         'email': user.email,
+        'is_banned': user.is_banned,
         'balance': 0,
     }
 
@@ -74,23 +75,23 @@ async def get_users(
     '''
 
     users = await crud.get_users(
-        db, 
-        start_id=((page - 1) * page_size), 
+        db,
+        start_id=((page - 1) * page_size),
         end_id=((page - 1) * page_size)
     )
 
     print({
-        'error': False,
-        'page': 1,
-        'page_size': 20,
-        'users': [{
-            'id': user.id,
-            'email': user.email,
-            'is_banned': user.is_banned,
-            'balance': 0,
-        } for user in users],
-    }
-)
+            'error': False,
+            'page': 1,
+            'page_size': 20,
+            'users': [{
+                'id': user.id,
+                'email': user.email,
+                'is_banned': user.is_banned,
+                'balance': 0,
+            } for user in users],
+        }
+    )
 
     return {
         'error': False,
@@ -119,16 +120,16 @@ async def create_user(
         new_user = await crud.create_user(db, create_shema.email, password)
         app.logging.info(f'Created user with id={new_user.id}')
 
-        return {
+        return JSONResponse(content={
             'error': False,
             'id': new_user.id,
             'email': new_user.email,
             'balance': 0,
             'is_banned': new_user.is_banned,
-        }
+        }, status_code=201)
     except ValueError:
         app.logging.error('Error while creating user: User with' +
-                           f'email={create_shema.email} already created')
+                          f'email={create_shema.email} already created')
 
         return JSONResponse(content={
             'error': True,

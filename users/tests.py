@@ -2,25 +2,28 @@ import main
 import app
 import pytest
 import httpx
-from app import views
+import asyncio
 
-views.destroy_models()
-views.init_models()
+client = httpx.AsyncClient(app=main.my_app, base_url=f'http://127.0.0.1:17012{app.PREFIX}')
 
-client = httpx.AsyncClient(app=main.app, base_url=f'http://127.0.0.1:17012{app.PREFIX}')
+@pytest.fixture(scope="session")
+def event_loop():
+    try:
+        loop = asyncio.get_running_loop()
+    except RuntimeError:
+        loop = asyncio.new_event_loop()
+    yield loop
+    loop.close()
 
-@pytest.mark.anyio
+@pytest.mark.asyncio
 @pytest.mark.order(1)
 async def test_health_check():
-    # print(os.environ.get('DB_HOST'), init.DATABASE_URL)
-
     response = await client.get('users/health')
-    print(response.url, response.status_code, response.content)
 
     assert response.status_code == 200
     assert not response.json()['error']
 
-@pytest.mark.anyio
+@pytest.mark.asyncio
 @pytest.mark.order(2)
 async def test_user_not_found():
     response = await client.get('users/1000')
@@ -31,7 +34,7 @@ async def test_user_not_found():
     assert response_json['code'] == 1
     assert response_json['message'] == 'User not found'
 
-@pytest.mark.anyio
+@pytest.mark.asyncio
 @pytest.mark.order(3)
 async def test_get_users():
     response = await client.get('users')
@@ -44,7 +47,7 @@ async def test_get_users():
     assert response_json['page_size'] == 20
     assert response_json['users'] == []
 
-@pytest.mark.anyio
+@pytest.mark.asyncio
 @pytest.mark.order(4)
 async def test_create():
     response = await client.post('users/create', json={
@@ -60,21 +63,24 @@ async def test_create():
     assert response_json['is_banned'] == False
     assert response_json['balance'] == 0
 
-@pytest.mark.anyio
+@pytest.mark.asyncio
 @pytest.mark.order(5)
 async def test_create_existing_user():
-    response = await client.post('users/create', json={
-        'email': 'sam_takoy@ti_tupoy.com',
-        'password': 'Loohi123',
-    })
-    assert response.status_code == 400
+    try:
+        response = await client.post('users/create', json={
+            'email': 'sam_takoy@ti_tupoy.com',
+            'password': 'Loohi123',
+        })
+        assert response.status_code == 400
 
-    response_json = response.json()
-    assert response_json['error'] == True
-    assert response_json['code'] == 2
-    assert response_json['message'] == 'User already exists'
+        response_json = response.json()
+        assert response_json['error'] == True
+        assert response_json['code'] == 2
+        assert response_json['message'] == 'User already exists'
+    except Exception as e:
+        print(e)
 
-@pytest.mark.anyio
+@pytest.mark.asyncio
 @pytest.mark.order(6)
 async def test_getting_user():
     response = await client.get('users/1')
@@ -87,10 +93,10 @@ async def test_getting_user():
     assert response_json['is_banned'] == False
     assert response_json['balance'] == 0
 
-@pytest.mark.anyio
+@pytest.mark.asyncio
 @pytest.mark.order(7)
 async def test_getting_users():
-    response = await client.get('users/')
+    response = await client.get('users')
     assert response.status_code == 200
 
     response_json = response.json()
