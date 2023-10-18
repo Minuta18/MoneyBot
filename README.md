@@ -3,7 +3,7 @@
 MoneyBot is a simple economy telegram bot. I am creating this project to learn some technologies:
 
 - [ ] Write microservices:
-  - [ ] Auth service
+  - [X] Auth service
   - [ ] Balance service
   - [ ] Telegram bot service
 - [X] Unit tests for at least 80% of code
