@@ -56,7 +56,7 @@ services:
       context: ./
       dockerfile: ./users/Dockerfile
     restart: on-failure
-    command: uvicorn main:my_app --reload --host 0.0.0.0 --port 17012
+    command: uvicorn main:my_app --reload --host 0.0.0.0 --port 17012 --log-config ./log.ini
     environment:
       DB_HOST: "database"
       DB_PORT: 17010
@@ -68,6 +68,8 @@ services:
       PREFIX: "/api/v2"
     ports:
       - "17012:17012"
+    volumes:
+      - ./volumes/etc/users/errors.log:/app/errors.log
     depends_on:
       database:
         condition: service_healthy # Starting only after DB

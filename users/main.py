@@ -1,10 +1,19 @@
 import fastapi
 import app
+import logging
 from app import views
+
+print('Server started')
 
 my_app = fastapi.FastAPI(
     openapi_url=app.OPENAPI_URL,
     docs_url=app.DOCS_URL,
+)
+
+logging.basicConfig(
+    filename='errors.log',
+    level=logging.INFO,
+    format='%(asctime)s %(levelname)s: %(message)s',
 )
 
 @my_app.on_event('startup')

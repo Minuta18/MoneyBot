@@ -1,0 +1,19 @@
+2023-10-18 06:46:29,460 INFO: Will watch for changes in these directories: ['/app']
+2023-10-18 06:46:29,460 INFO: Uvicorn running on http://0.0.0.0:17012 (Press CTRL+C to quit)
+2023-10-18 06:46:29,461 INFO: Started reloader process [1] using StatReload
+2023-10-18 06:46:29,936 INFO: Started server process [8]
+2023-10-18 06:46:29,936 INFO: Waiting for application startup.
+2023-10-18 06:46:30,106 INFO: Application startup complete.
+2023-10-18 06:46:36,422 INFO: 172.18.0.1:38600 - "GET /api/v2/users/docs HTTP/1.1" 200
+2023-10-18 06:46:36,498 INFO: 172.18.0.1:38600 - "GET /api/v2/users/openapi.json HTTP/1.1" 200
+2023-10-18 06:46:41,544 ERROR: User not found with id=42
+2023-10-18 06:46:41,544 INFO: 172.18.0.1:38616 - "GET /api/v2/users/42 HTTP/1.1" 404
+2023-10-18 06:46:42,084 ERROR: User not found with id=42
+2023-10-18 06:46:42,084 INFO: 172.18.0.1:38616 - "GET /api/v2/users/42 HTTP/1.1" 404
+2023-10-18 06:46:42,575 ERROR: User not found with id=42
+2023-10-18 06:46:42,576 INFO: 172.18.0.1:38616 - "GET /api/v2/users/42 HTTP/1.1" 404
+2023-10-18 06:46:46,753 INFO: Shutting down
+2023-10-18 06:46:46,855 INFO: Waiting for application shutdown.
+2023-10-18 06:46:46,856 INFO: Application shutdown complete.
+2023-10-18 06:46:46,856 INFO: Finished server process [8]
+2023-10-18 06:46:46,940 INFO: Stopping reloader process [1]
